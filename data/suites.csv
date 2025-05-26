@@ -1,2 +1,3 @@
 "Status","Start Time","Stop Time","Duration in ms","Parent Suite","Suite","Sub Suite","Test Class","Test Method","Name","Description"
-"passed","Mon May 26 09:43:05 UTC 2025","Mon May 26 09:43:12 UTC 2025","6305","tests","test_organsierDemo","TestDeepkiContact","","","Test: test_successful_Demo[chromium]","Fichier de test: test_organsierDemo.py"
+"passed","Mon May 26 15:04:37 UTC 2025","Mon May 26 15:04:41 UTC 2025","3609","tests","test_SASSolution","TestSASSolutions","","","Test: test_discover_sas_solutions[chromium]","Fichier de test: test_SASSolution.py"
+"passed","Mon May 26 15:04:41 UTC 2025","Mon May 26 15:04:47 UTC 2025","5733","tests","test_organsierDemo","TestDeepkiContact","","","Test: test_successful_Demo[chromium]","Fichier de test: test_organsierDemo.py"

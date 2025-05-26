@@ -56,7 +56,8 @@ jobs:
       - name: Run tests with Allure
         run: |
           # Option 1: Si vos tests sont dans un dossier 'tests'
-          pytest tests/ --alluredir=allure-results -v
+          #pytest tests/ --alluredir=allure-results -v
+          pytest tests/test_organsierDemo.py tests/testSASSolution.py --alluredir=allure-results -v
           
           # Option 2: Si vos tests sont à la racine (décommentez si nécessaire)
           # pytest . --alluredir=allure-results -v

@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 import allure
 from datetime import datetime
+from pages.sasSolutionsPage import SolutionsPage
 
 
 
@@ -19,11 +20,15 @@ def browser_context_args(browser_context_args):
 
     }
 
-@pytest.fixture(scope="function")
-def context(browser: Browser):
+@pytest.fixture
+def context(browser):
     context = browser.new_context()
     yield context
-    context.close()
+    try:
+        context.close()
+    except Exception as e:
+        print(f"Warning: Error closing context: {e}")
+        pass
 
 @pytest.fixture(scope="function")
 def page(context: BrowserContext):
@@ -31,6 +36,10 @@ def page(context: BrowserContext):
     yield page
     page.close()
 
+
+@pytest.fixture
+def solutions_page(page): 
+    return SolutionsPage(page)
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item, call):
@@ -40,23 +49,20 @@ def pytest_runtest_makereport(item, call):
     outcome = yield
     report = outcome.get_result()
     
-    # Ajouter des informations supplémentaires au rapport Allure
     if hasattr(item, 'funcargs'):
-        # Capturer les informations du test
         test_name = item.name
         test_file = item.fspath.basename if hasattr(item, 'fspath') else 'Unknown'
         
-        # Ajouter des métadonnées au rapport Allure
         if report.when == "call":
             allure.dynamic.title(f"Test: {test_name}")
             allure.dynamic.description(f"Fichier de test: {test_file}")
             
-            # En cas d'échec du test
+           
             if report.failed:
-                # Capturer la capture d'écran
+               
                 capture_screenshot_on_failure(item)
                 
-                # Ajouter les logs d'erreur
+                
                 if hasattr(report, 'longrepr') and report.longrepr:
                     allure.attach(
                         str(report.longrepr),
@@ -64,7 +70,7 @@ def pytest_runtest_makereport(item, call):
                         attachment_type=allure.attachment_type.TEXT
                     )
                 
-                # Ajouter l'horodatage de l'échec
+              
                 failure_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 allure.attach(
                     f"Échec du test le: {failure_time}",
@@ -72,7 +78,7 @@ def pytest_runtest_makereport(item, call):
                     attachment_type=allure.attachment_type.TEXT
                 )
             
-            # En cas de succès du test
+          
             elif report.passed:
                 success_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 allure.attach(
@@ -146,7 +152,7 @@ def setup_allure_environment():
     yield
 
 
-# Fixtures personnalisées pour Allure
+
 @pytest.fixture
 def allure_step():
     """
@@ -157,17 +163,15 @@ def allure_step():
     return step
 
 
-# Configuration des catégories d'erreurs pour Allure
 def pytest_configure(config):
     """
     Configuration des catégories d'erreurs Allure
     """
-    # Créer le répertoire allure-results s'il n'existe pas
     allure_dir = config.getoption("--alluredir")
     if allure_dir and not os.path.exists(allure_dir):
         os.makedirs(allure_dir)
     
-    # Créer le fichier categories.json pour Allure
+    
     if allure_dir:
         categories_path = os.path.join(allure_dir, "categories.json")
         categories_content = '''[
@@ -199,13 +203,11 @@ def pytest_configure(config):
             print(f"Impossible de créer categories.json: {e}")
 
 
-# Hook pour personnaliser les rapports de test
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_setup(item):
     """
     Hook exécuté avant chaque test
     """
-    # Ajouter des informations de démarrage
     start_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     allure.attach(
         f"Démarrage du test: {start_time}",
@@ -222,8 +224,8 @@ def pytest_runtest_teardown(item):
     Hook exécuté après chaque test
     """
     yield
-    
-    # Ajouter des informations de fin
+  
+  
     end_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     allure.attach(
         f"Fin du test: {end_time}",

@@ -22,3 +22,13 @@ class BasePage:
         element = self.wait_for_element(selector)
         element.clear()
         element.fill(value)
+        
+    def wait_for_element(self, selector: str, timeout: int = 5000):
+        """Attendre qu'un élément soit visible"""
+        self.page.wait_for_selector(selector, timeout=timeout)
+ 
+       
+    def get_text(self, selector: str) -> str:
+        """Récupérer le texte d'un élément"""
+        self.wait_for_element(selector)
+        return self.page.text_content(selector)

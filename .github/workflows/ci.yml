@@ -3,24 +3,34 @@ name: Playwright Tests
 on: 
   push:
   pull_request:
-  workflow_dispatch:    # Ajout du trigger manuel
+  workflow_dispatch:    # Trigger manuel
+
+# Ajout des permissions nécessaires pour GitHub Pages
+permissions:
+  contents: write       # Nécessaire pour peaceiris/actions-gh-pages
+  pages: write         # Permissions pour GitHub Pages
+  id-token: write      # Permissions pour l'authentification
 
 jobs:
   test:
     runs-on: ubuntu-22.04
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
+          
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install allure-pytest
           playwright install --with-deps
+          
       - name: Install Allure CLI
         run: |
           sudo apt-get update
@@ -28,21 +38,26 @@ jobs:
           curl -o allure-2.25.0.tgz -Ls https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.25.0/allure-commandline-2.25.0.tgz
           sudo tar -zxvf allure-2.25.0.tgz -C /opt/
           sudo ln -s /opt/allure-2.25.0/bin/allure /usr/bin/allure
+          
       - name: Run tests with Allure
         run: |
           pytest --alluredir=allure-results
+          
       - name: Generate Allure Report
         run: |
           mkdir -p allure-report
           allure generate allure-results -o allure-report --clean || true
+          
       - name: Upload Allure Report
         uses: actions/upload-artifact@v4
         with:
           name: allure-report
           path: allure-report
+          
       - name: Deploy to GitHub Pages
         if: github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./allure-report
+          publish_branch: gh-pages  # Optionnel, mais explicite

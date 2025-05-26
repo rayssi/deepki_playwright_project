@@ -1,0 +1,2 @@
+"Status","Start Time","Stop Time","Duration in ms","Parent Suite","Suite","Sub Suite","Test Class","Test Method","Name","Description"
+"passed","Mon May 26 09:43:05 UTC 2025","Mon May 26 09:43:12 UTC 2025","6305","tests","test_organsierDemo","TestDeepkiContact","","","Test: test_successful_Demo[chromium]","Fichier de test: test_organsierDemo.py"

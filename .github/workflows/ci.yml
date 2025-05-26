@@ -39,9 +39,30 @@ jobs:
           sudo tar -zxvf allure-2.25.0.tgz -C /opt/
           sudo ln -s /opt/allure-2.25.0/bin/allure /usr/bin/allure
           
+      # Ajout d'une étape de debug pour voir la structure
+      - name: Debug - Show project structure
+        run: |
+          echo "=== Project structure ==="
+          find . -name "*.py" -type f | head -20
+          echo "=== Test files ==="
+          find . -name "test_*.py" -o -name "*_test.py" | head -20
+          
+      # Ajout d'une étape pour découvrir les tests
+      - name: Debug - Discover tests
+        run: |
+          echo "=== Pytest discovery ==="
+          pytest --collect-only -q
+          
       - name: Run tests with Allure
         run: |
-          pytest --alluredir=allure-results
+          # Option 1: Si vos tests sont dans un dossier 'tests'
+          pytest tests/ --alluredir=allure-results -v
+          
+          # Option 2: Si vos tests sont à la racine (décommentez si nécessaire)
+          # pytest . --alluredir=allure-results -v
+          
+          # Option 3: Forcer la recherche de tous les fichiers de test (décommentez si nécessaire)
+          # pytest $(find . -name "test_*.py" -o -name "*_test.py") --alluredir=allure-results -v
           
       - name: Generate Allure Report
         run: |
